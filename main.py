@@ -11,12 +11,23 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (109, 196, 255)
 
-BUTTON_SIZE = 32
-BLOCKSIZE = 20
+BUTTON_SIZE = 30
+BLOCKSIZE = 30
+
+class CellsGrid:
+    def __init__(self, resolution):
+        self.cells = numpy.zeros(resolution, dtype=bool)
+        self.res = resolution
+    def change_cell(self, pos):
+        self.cells[pos[0], pos[1]] = not self.cells[pos[0], pos[1]]
+
+    def __getitem__(self, k):
+        return self.cells[k]
 
 
 
-class ConwaysLife():
+
+class ConwaysLife:
     def do_play(self):
         self.play = True
         self.stop = False
@@ -38,10 +49,8 @@ class ConwaysLife():
         self.play = False
         self.stop = False
 
-        self.x_cells = self.resolution[0] // BLOCKSIZE
-        self.y_cells = self.resolution[1] // BLOCKSIZE
+        self.cells = CellsGrid((self.resolution[0] // BLOCKSIZE, self.resolution[1] // BLOCKSIZE))
 
-        self.cells = numpy.zeros((self.x_cells, self.y_cells), dtype=int)
 
     def mainloop(self):
 
@@ -86,7 +95,9 @@ class ConwaysLife():
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
-                        main_button.check_hold(event.pos)
+                        if not main_button.check_hold(event.pos):
+                            self.cells.change_cell((event.pos[0] // BLOCKSIZE, event.pos[1] // BLOCKSIZE))
+
 
 
                 if event.type == pygame.MOUSEBUTTONUP:
@@ -99,8 +110,8 @@ class ConwaysLife():
                 pass
 
             blockSize = 20 #Set the size of the grid block
-            for x in range(self.x_cells):
-                for y in range(self.y_cells):
+            for x in range(self.cells.res[0]):
+                for y in range(self.cells.res[1]):
                     rect = pygame.Rect(x*BLOCKSIZE, y*BLOCKSIZE, BLOCKSIZE, BLOCKSIZE)
                     pygame.draw.rect(self.screen, WHITE, rect, (not self.cells[x][y]))
 

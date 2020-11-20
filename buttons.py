@@ -30,6 +30,7 @@ class Button:
     def check_hold(self, pos):
         if self.rect.collidepoint(pos) and self.show:
             self.state = "pressed"
+        return self.rect.collidepoint(pos) and self.show
 
     def check_release(self):
         if self.state == "pressed":
@@ -67,8 +68,10 @@ class MainButton(Button):
     def check_hold(self, pos):
         if self.rect.collidepoint(pos) and self.show:
             self.state = "pressed"
+        pressed = self.rect.collidepoint(pos) and self.show
         for child in self.children:
-            child.check_hold(pos)
+            pressed = pressed or child.check_hold(pos)
+        return pressed
 
     def check_release(self):
         if self.state == "pressed":
